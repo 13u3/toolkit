@@ -8,9 +8,11 @@ type DefaultConfig struct {
 }
 
 // 初始化配置
-func NewConfig(endpoints []string, dialTimeout time.Duration) *DefaultConfig {
+func NewDefaultConfig(endpoints []string, dialTimeout time.Duration) *DefaultConfig {
 	return &DefaultConfig{
 		Endpoints:   endpoints,
 		DialTimeout: dialTimeout,
 	}
 }
+
+// 连接Etcd
