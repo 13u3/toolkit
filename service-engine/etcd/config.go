@@ -15,11 +15,11 @@ type DefaultConfig struct {
 }
 
 // 初始化默认配置
-func NewDefaultConfig(endpoints []string, dialTimeout time.Duration, ContextTimeout time.Duration) *DefaultConfig {
+func NewDefaultConfig(endpoints []string, dialTimeout time.Duration, contextTimeout time.Duration) *DefaultConfig {
 	return &DefaultConfig{
 		Endpoints:   endpoints,
 		DialTimeout: dialTimeout,
-		ContextTimeout: ContextTimeout,
+		ContextTimeout: contextTimeout,
 	}
 }
 
