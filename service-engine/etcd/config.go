@@ -92,3 +92,18 @@ func (s *Service) UnRegisterService(uuid, nodeId string) error {
 	}
 	return nil
 }
+
+// 获取服务列表
+func (s *Service) GetServiceList(uuid string) ([]string, error) {
+	kv := clientv3.NewKV(s.Client)
+	ctx := context.Background()
+	resp, err := kv.Get(ctx, ServicePrefix+uuid, clientv3.WithPrefix())
+	if err != nil {
+		return nil, err
+	}
+	var serviceList []string
+	for _, kvpair := range resp.Kvs {
+		serviceList = append(serviceList, string(kvpair.Value))
+	}
+	return serviceList, nil
+}
