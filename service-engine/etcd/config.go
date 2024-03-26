@@ -11,34 +11,84 @@ import (
 type DefaultConfig struct {
 	Endpoints   []string
 	DialTimeout time.Duration
-	ContextTimeout time.Duration
 }
 
+type Service struct {
+	Client *clientv3.Client
+}
+
+const (
+	ServicePrefix = "/services/"
+)
+
 // 初始化默认配置
-func NewDefaultConfig(endpoints []string, dialTimeout time.Duration, contextTimeout time.Duration) *DefaultConfig {
+func NewDefaultConfig(endpoints []string, dialTimeout time.Duration) *DefaultConfig {
 	return &DefaultConfig{
 		Endpoints:   endpoints,
 		DialTimeout: dialTimeout,
-		ContextTimeout: contextTimeout,
 	}
 }
 
 // 创建etcd客户端
-func (dc *DefaultConfig) NewClient() (*clientv3.Client, error) {
-    return clientv3.New(clientv3.Config{
-		Endpoints:   dc.Endpoints,
-		DialTimeout: time.Duration(dc.DialTimeout) * time.Second,
+func (c *DefaultConfig) NewClient() (*Service, error) {
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   c.Endpoints,
+		DialTimeout: time.Duration(c.DialTimeout) * time.Second,
 	})
+	if err != nil {
+		return nil, err
+	}
+	return &Service{
+		Client: cli,
+	}, nil
 }
 
 // 注册服务
-func (dc *DefaultConfig) RegisterService(client *clientv3.Client, key, value string) error {
-    ctx, cancel := context.WithTimeout(context.Background(), time.Duration(dc.ContextTimeout) * time.Second)
-	resp, err := client.Put(ctx, key, value)
-	defer cancel()
+func (s *Service) RegisterService(uuid, nodeId, Address string) error {
+	kv := clientv3.NewKV(s.Client)
+	ctx := context.Background()
+	// 创建租约
+	lease := clientv3.NewLease(s.Client)
+	leaseResp, err := lease.Grant(ctx, 30) //60秒
 	if err != nil {
-	    fmt.Printf("register service failed, err:%v\n", err)
+		return err
 	}
-	fmt.Printf("register service success, resp:%v\n", resp)
-	return err
+	// 注册
+	_, err = kv.Put(ctx, ServicePrefix+uuid+"/"+nodeId, Address, clientv3.WithLease(leaseResp.ID))
+	if err != nil {
+		return err
+	}
+
+	// 续约，keepRespChan是个只读的Channel
+	keepRespChan, err := lease.KeepAlive(ctx, leaseResp.ID)
+	if err != nil {
+		return err
+	}
+	go PrintKeepRespChan(keepRespChan)
+	return nil
+}
+
+// 打印续约信息
+func PrintKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse) {
+	for {
+		select {
+		case keepResp := <-keepRespChan:
+			if keepResp == nil {
+				return
+			}
+			// 续约成功
+			fmt.Println("续约成功")
+		}
+	}
+}
+
+// 注销服务
+func (s *Service) UnRegisterService(uuid, nodeId string) error {
+	kv := clientv3.NewKV(s.Client)
+	ctx := context.Background()
+	_, err := kv.Delete(ctx, ServicePrefix+uuid+"/"+nodeId)
+	if err != nil {
+		return err
+	}
+	return nil
 }
