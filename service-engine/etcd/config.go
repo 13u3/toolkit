@@ -49,7 +49,7 @@ func (s *Service) RegisterService(uuid, nodeId, Address string) error {
 	ctx := context.Background()
 	// 创建租约
 	lease := clientv3.NewLease(s.Client)
-	leaseResp, err := lease.Grant(ctx, 10) //60秒
+	leaseResp, err := lease.Grant(ctx, 30) //60秒
 	if err != nil {
 		return err
 	}
