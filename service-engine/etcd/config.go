@@ -25,7 +25,7 @@ const (
 func NewDefaultConfig(endpoints []string, dialTimeout time.Duration) *DefaultConfig {
 	return &DefaultConfig{
 		Endpoints:   endpoints,
-		DialTimeout: dialTimeout,
+		DialTimeout: 10 * time.Second,
 	}
 }
 
