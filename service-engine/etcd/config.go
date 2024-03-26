@@ -25,7 +25,7 @@ const (
 func NewDefaultConfig(endpoints []string, dialTimeout time.Duration) *DefaultConfig {
 	return &DefaultConfig{
 		Endpoints:   endpoints,
-		DialTimeout: 10 * time.Second,
+		DialTimeout: dialTimeout,
 	}
 }
 
@@ -33,7 +33,7 @@ func NewDefaultConfig(endpoints []string, dialTimeout time.Duration) *DefaultCon
 func (c *DefaultConfig) NewClient() (*Service, error) {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.Endpoints,
-		DialTimeout: time.Duration(c.DialTimeout) * time.Second,
+		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
 		return nil, err
