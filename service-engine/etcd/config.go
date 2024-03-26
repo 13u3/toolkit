@@ -62,7 +62,7 @@ func (s *Service) RegisterService(uuid, nodeId, Address string) error {
 	}
 
 	// 续约，keepRespChan是个只读的Channel
-	keepRespChan, err := lease.KeepAlive(ctx, leaseResp.ID)
+	keepRespChan, err := lease.KeepAlive(context.TODO(), leaseResp.ID)
 	if err != nil {
 		return err
 	}
