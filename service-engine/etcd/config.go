@@ -46,7 +46,9 @@ func (c *DefaultConfig) NewClient() (*Service, error) {
 // 注册服务
 func (s *Service) RegisterService(uuid, nodeId, Address string) error {
 	kv := clientv3.NewKV(s.Client)
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
 	// 创建租约
 	lease := clientv3.NewLease(s.Client)
 	leaseResp, err := lease.Grant(ctx, 30) //60秒
@@ -60,7 +62,7 @@ func (s *Service) RegisterService(uuid, nodeId, Address string) error {
 	}
 
 	// 续约，keepRespChan是个只读的Channel
-	keepRespChan, err := lease.KeepAlive(ctx, leaseResp.ID)
+	keepRespChan, err := lease.KeepAlive(context.Background(), leaseResp.ID)
 	if err != nil {
 		return err
 	}
