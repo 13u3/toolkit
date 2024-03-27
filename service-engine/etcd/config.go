@@ -56,7 +56,7 @@ func NewClient(endpoints []string, dialTimeout time.Duration) (*Service, error) 
 }
 
 // 注册服务
-func (s *Service) RegisterService(uuid, nodeId, Address string) error {
+func (s *Service) RegisterService(clusterId, nodeId, Address string) error {
 	kv := clientv3.NewKV(s.Client)
 	//ctx := context.Background()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -68,7 +68,7 @@ func (s *Service) RegisterService(uuid, nodeId, Address string) error {
 		return err
 	}
 	// 注册
-	_, err = kv.Put(ctx, ServicePrefix+uuid+"/"+nodeId, Address, clientv3.WithLease(leaseResp.ID))
+	_, err = kv.Put(ctx, ServicePrefix+clusterId+"/"+nodeId, Address, clientv3.WithLease(leaseResp.ID))
 	if err != nil {
 		return err
 	}
@@ -97,10 +97,10 @@ func PrintKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse) {
 }
 
 // 注销服务
-func (s *Service) UnRegisterService(uuid, nodeId string) error {
+func (s *Service) UnRegisterService(clusterId, nodeId string) error {
 	kv := clientv3.NewKV(s.Client)
 	ctx := context.Background()
-	_, err := kv.Delete(ctx, ServicePrefix+uuid+"/"+nodeId)
+	_, err := kv.Delete(ctx, ServicePrefix+clusterId+"/"+nodeId)
 	if err != nil {
 		return err
 	}
@@ -108,10 +108,10 @@ func (s *Service) UnRegisterService(uuid, nodeId string) error {
 }
 
 // 获取服务列表
-func (s *Service) GetServiceList(uuid string) ([]string, error) {
+func (s *Service) GetServiceList(clusterId string) ([]string, error) {
 	kv := clientv3.NewKV(s.Client)
 	ctx := context.Background()
-	resp, err := kv.Get(ctx, ServicePrefix+uuid, clientv3.WithPrefix())
+	resp, err := kv.Get(ctx, ServicePrefix+clusterId, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
@@ -120,4 +120,14 @@ func (s *Service) GetServiceList(uuid string) ([]string, error) {
 		serviceList = append(serviceList, string(kvpair.Value))
 	}
 	return serviceList, nil
+}
+// 获取服务
+func (s *Service) GetService(clusterId, nodeId string) (string, error) {
+    kv := clientv3.NewKV(s.Client)
+	ctx := context.Background()
+	resp, err := kv.Get(ctx, ServicePrefix+clusterId+"/"+nodeId)
+	if err != nil {
+		return "", err
+	}
+	return string(resp.Kvs[0].Value), nil
 }
