@@ -159,9 +159,9 @@ func (s *Service) WatchService(key string, callback func(string), withPrefix ...
 	            for _, ev := range wresp.Events {
 	                switch ev.Type {
 	                case clientv3.EventTypePut:
-	                    callback(string(ev.Kv.Value))
+	                    callback(string(ev.Kv.Key) + "-" + string(ev.Kv.Key))
 	                case clientv3.EventTypeDelete:
-	                    callback("")
+	                    callback(string(ev.Kv.Key) + "-" + string(ev.Kv.Key))
 	                }
 	            }
 	        }
