@@ -8,10 +8,10 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-type DefaultConfig struct {
+/* type DefaultConfig struct {
 	Endpoints   []string
 	DialTimeout time.Duration
-}
+} */
 
 type Service struct {
 	Client *clientv3.Client
@@ -22,18 +22,30 @@ const (
 )
 
 // 初始化默认配置
-func NewDefaultConfig(endpoints []string, dialTimeout time.Duration) *DefaultConfig {
+/* func NewDefaultConfig(endpoints []string, dialTimeout time.Duration) *DefaultConfig {
 	return &DefaultConfig{
 		Endpoints:   endpoints,
 		DialTimeout: dialTimeout,
 	}
-}
+} */
 
 // 创建etcd客户端
-func (c *DefaultConfig) NewClient() (*Service, error) {
+/* func (c *DefaultConfig) NewClient() (*Service, error) {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.Endpoints,
 		DialTimeout: time.Duration(c.DialTimeout) * time.Second,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &Service{
+		Client: cli,
+	}, nil
+} */
+func NewClient(endpoints []string, dialTimeout time.Duration) (*Service, error) {
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   endpoints,
+		DialTimeout: time.Duration(dialTimeout) * time.Second,
 	})
 	if err != nil {
 		return nil, err
