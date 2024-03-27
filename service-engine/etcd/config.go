@@ -153,6 +153,7 @@ func (s *Service) WatchService(key string, callback func(string), withPrefix ...
 		rch = s.Client.Watch(ctx, ServicePrefix+key)
 	}
 	go func() {
+		fmt.Println("Watch......")
 	    for {
 	        select {
 	        case wresp := <-rch:
