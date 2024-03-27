@@ -143,9 +143,9 @@ func (s *Service) GetService(clusterId, nodeId string) (string, error) {
 
 // 监听服务列表
 func (s *Service) WatchService(key string, callback func(string), withPrefix ...bool) {
-	//ctx := context.Background()
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
-	defer cancel()
+	ctx := context.Background()
+	//ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	//defer cancel()
 	var rch clientv3.WatchChan
 	if len(withPrefix) > 0 && withPrefix[0] {
 		rch = s.Client.Watch(ctx, ServicePrefix+key, clientv3.WithPrefix())
