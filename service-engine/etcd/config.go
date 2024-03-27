@@ -152,7 +152,6 @@ func (s *Service) WatchService(key string, callback func(string), withPrefix ...
 	} else {
 		rch = s.Client.Watch(ctx, ServicePrefix+key)
 	}
-	defer s.Client.Close()
 	go func() {
 	    for {
 	        select {
