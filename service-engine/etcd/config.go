@@ -72,7 +72,6 @@ func (s *Service) RegisterService(clusterId, nodeId, Address string) error {
 	if err != nil {
 		return err
 	}
-
 	// 续约，keepRespChan是个只读的Channel
 	keepRespChan, err := lease.KeepAlive(context.Background(), leaseResp.ID)
 	if err != nil {
@@ -99,18 +98,23 @@ func PrintKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse) {
 // 注销服务
 func (s *Service) UnRegisterService(clusterId, nodeId string) error {
 	kv := clientv3.NewKV(s.Client)
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	defer cancel()
 	_, err := kv.Delete(ctx, ServicePrefix+clusterId+"/"+nodeId)
 	if err != nil {
 		return err
 	}
+	defer s.Client.Close()
 	return nil
 }
 
 // 获取服务列表
 func (s *Service) GetServiceList(clusterId string) ([]string, error) {
 	kv := clientv3.NewKV(s.Client)
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	defer cancel()
 	resp, err := kv.Get(ctx, ServicePrefix+clusterId, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
@@ -119,16 +123,20 @@ func (s *Service) GetServiceList(clusterId string) ([]string, error) {
 	for _, kvpair := range resp.Kvs {
 		serviceList = append(serviceList, string(kvpair.Value))
 	}
+	defer s.Client.Close()
 	return serviceList, nil
 }
 
 // 获取服务
 func (s *Service) GetService(clusterId, nodeId string) (string, error) {
     kv := clientv3.NewKV(s.Client)
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	defer cancel()
 	resp, err := kv.Get(ctx, ServicePrefix+clusterId+"/"+nodeId)
 	if err != nil {
 		return "", err
 	}
+	defer s.Client.Close()
 	return string(resp.Kvs[0].Value), nil
 }
