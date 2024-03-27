@@ -108,8 +108,21 @@ func (s *Service) UnRegisterService(clusterId, nodeId string) error {
 }
 
 // 获取服务列表
-func (s *Service) GetServiceList(clusterId string) ([]string, error) {
+/* func (s *Service) GetServiceList(clusterId string) ([]string, error) {
 	kv := clientv3.NewKV(s.Client)
+	ctx := context.Background()
+	resp, err := kv.Get(ctx, ServicePrefix+clusterId, clientv3.WithPrefix())
+	if err != nil {
+		return nil, err
+	}
+	var serviceList []string
+	for _, kvpair := range resp.Kvs {
+		serviceList = append(serviceList, string(kvpair.Value))
+	}
+	return serviceList, nil
+} */
+func GetServiceList(client *clientv3.Client, clusterId string) ([]string, error) {
+	kv := clientv3.NewKV(client)
 	ctx := context.Background()
 	resp, err := kv.Get(ctx, ServicePrefix+clusterId, clientv3.WithPrefix())
 	if err != nil {
