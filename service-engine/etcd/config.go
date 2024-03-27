@@ -140,3 +140,29 @@ func (s *Service) GetService(clusterId, nodeId string) (string, error) {
 	defer s.Client.Close()
 	return string(resp.Kvs[0].Value), nil
 }
+
+// 监听服务列表
+func (s *Service) WatchService(key string, callback func(string), withPrefix ...bool) {
+	ctx := context.Background()
+	var rch clientv3.WatchChan
+	if len(withPrefix) > 0 && withPrefix[0] {
+		rch = s.Client.Watch(ctx, ServicePrefix+key, clientv3.WithPrefix())
+	} else {
+		rch = s.Client.Watch(ctx, ServicePrefix+key)
+	}
+	go func() {
+	    for {
+	        select {
+	        case wresp := <-rch:
+	            for _, ev := range wresp.Events {
+	                switch ev.Type {
+	                case clientv3.EventTypePut:
+	                    callback(string(ev.Kv.Value))
+	                case clientv3.EventTypeDelete:
+	                    callback("")
+	                }
+	            }
+	        }
+	    }
+	}()
+}
