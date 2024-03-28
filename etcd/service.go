@@ -7,6 +7,13 @@ import (
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
+
+type WatchCallback struct{
+	Type string
+	Key string
+	Value string
+}
+
 // 注册服务
 func (e *EtcdService) RegisterService(key, value string) error {
 	if e.Client == nil {

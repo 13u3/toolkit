@@ -9,11 +9,7 @@ type EtcdService struct {
 	Client *clientv3.Client
 }
 
-type WatchCallback struct{
-	Type string
-	Key string
-	Value string
-}
+
 const(
 	servicePrefix = "/service/"
 )
