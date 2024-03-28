@@ -45,7 +45,7 @@ func PrintKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse) {
 				return
 			}
 			// 续约成功
-			fmt.Printf(time.Now().Format("2006-01-02 15:04:05") + "续约成功：%+v\n", keepResp)
+			//fmt.Printf(time.Now().Format("2006-01-02 15:04:05") + "续约成功：%+v\n", keepResp)
 		}
 	}
 }
@@ -72,7 +72,7 @@ func (e *EtcdService) GetServiceList(key string) ([]string, error) {
 }
 
 // 监听指定服务列表
-func (e *EtcdService) WatchServiceList(key string, callback func(WatchCallback)) error{
+func (e *EtcdService) WatchService(key string, callback func(WatchCallback)) error{
     if e.Client == nil {
 		return fmt.Errorf("etcd连接未初始化")
 	}
@@ -86,13 +86,13 @@ func (e *EtcdService) WatchServiceList(key string, callback func(WatchCallback))
 	                switch event.Type {
 	                case clientv3.EventTypePut:
 	                    callback(WatchCallback{
-							Type: "Put",
+							Type: "PUT",
 							Key: string(event.Kv.Key),
 							Value: string(event.Kv.Value),
 						})
 	                case clientv3.EventTypeDelete:
 	                    callback(WatchCallback{
-							Type: "Delete",
+							Type: "DELETE",
 							Key: string(event.Kv.Key),
 							Value: string(event.Kv.Value),
 						})
