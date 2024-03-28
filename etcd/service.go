@@ -10,7 +10,7 @@ import (
 // 注册服务
 func (e *EtcdService) RegisterService(key, value string) error {
 	if e.Client == nil {
-		return fmt.Errorf("连接etcd未初始化")
+		return fmt.Errorf("连接Etcd未初始化")
 	}
 	kv := clientv3.NewKV(e.Client)
 	//ctx := context.Background()
@@ -45,7 +45,7 @@ func PrintEtcdKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse)
 				return
 			}
 			// 续约成功
-			fmt.Printf(time.Now().Format("2006-01-02 15:04:05") + "续约成功：%+v\n", keepResp)
+			fmt.Printf(time.Now().Format("2006-01-02 15:04:05") + "Etcd服务续约成功：%+v\n", keepResp)
 		}
 	}
 }
@@ -53,7 +53,7 @@ func PrintEtcdKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse)
 // 获取指定服务列表
 func (e *EtcdService) GetServiceList(key string) ([]string, error) {
 	if e.Client == nil {
-		return nil, fmt.Errorf("etcd连接未初始化")
+		return nil, fmt.Errorf("Etcd连接未初始化")
 	}
 	kv := clientv3.NewKV(e.Client)
 	//ctx := context.Background()
@@ -74,7 +74,7 @@ func (e *EtcdService) GetServiceList(key string) ([]string, error) {
 // 监听指定服务列表
 func (e *EtcdService) WatchService(key string, callback func(WatchCallback)) error{
     if e.Client == nil {
-		return fmt.Errorf("etcd连接未初始化")
+		return fmt.Errorf("Etcd连接未初始化")
 	}
 	watchRespCh := e.Client.Watch(context.Background(), servicePrefix + key, clientv3.WithPrefix())
 	go func() {
