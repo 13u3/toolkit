@@ -1,4 +1,4 @@
-package service
+package etcd
 
 import (
 	"context"
@@ -32,12 +32,12 @@ func (e *EtcdService) RegisterService(key, value string) error {
 	if err != nil {
 		return err
 	}
-	go PrintKeepRespChan(keepRespChan)
+	go PrintEtcdKeepRespChan(keepRespChan)
 	return nil
 }
 
 // 打印续约信息
-func PrintKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse) {
+func PrintEtcdKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse) {
 	for {
 		select {
 		case keepResp := <-keepRespChan:
@@ -45,7 +45,7 @@ func PrintKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse) {
 				return
 			}
 			// 续约成功
-			//fmt.Printf(time.Now().Format("2006-01-02 15:04:05") + "续约成功：%+v\n", keepResp)
+			fmt.Printf(time.Now().Format("2006-01-02 15:04:05") + "续约成功：%+v\n", keepResp)
 		}
 	}
 }
