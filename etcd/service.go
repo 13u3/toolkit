@@ -101,7 +101,6 @@ func (e *EtcdService) WatchService(key string, callback func(WatchCallback)) err
 	                    go callback(WatchCallback{
 							Type: "DELETE",
 							Key: string(event.Kv.Key),
-							Value: string(event.Kv.Value),
 						})
 	                }
 	            }
