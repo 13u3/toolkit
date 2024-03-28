@@ -52,7 +52,7 @@ func PrintEtcdKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse)
 				return
 			}
 			// 续约成功
-			fmt.Printf(time.Now().Format("2006-01-02 15:04:05") + "Etcd服务续约成功：%+v\n", keepResp)
+			fmt.Printf(time.Now().Format("2006-01-02 15:04:05") + " Etcd服务续约成功：%+v\n", keepResp)
 		}
 	}
 }
@@ -85,7 +85,7 @@ func (e *EtcdService) WatchService(key string, callback func(WatchCallback)) err
 	}
 	watchRespCh := e.Client.Watch(context.Background(), servicePrefix + key, clientv3.WithPrefix())
 	go func() {
-		fmt.Println("开始监听"+key+"服务......")
+		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " 开始监听"+key+"服务......")
 	    for {
 	        select {
 	        case watchResp := <-watchRespCh:
