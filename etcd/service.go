@@ -92,13 +92,13 @@ func (e *EtcdService) WatchService(key string, callback func(WatchCallback)) err
 	            for _, event := range watchResp.Events {
 	                switch event.Type {
 	                case clientv3.EventTypePut:
-	                    callback(WatchCallback{
+	                    go callback(WatchCallback{
 							Type: "PUT",
 							Key: string(event.Kv.Key),
 							Value: string(event.Kv.Value),
 						})
 	                case clientv3.EventTypeDelete:
-	                    callback(WatchCallback{
+	                    go callback(WatchCallback{
 							Type: "DELETE",
 							Key: string(event.Kv.Key),
 							Value: string(event.Kv.Value),
