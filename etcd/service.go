@@ -9,9 +9,9 @@ import (
 )
 
 type WatchCallback struct{
-	Type string
-	Key string
-	Value string
+	Type string //事件类型 PUT/DELETE
+	Key string //服务key
+	Value string //服务value
 }
 
 // 注册服务
@@ -74,7 +74,6 @@ func (e *EtcdService) GetServiceList(key string) ([]string, error) {
 	for _, kvpair := range resp.Kvs {
 		serviceList = append(serviceList, string(kvpair.Value))
 	}
-	defer e.Client.Close()
 	return serviceList, nil
 }
 
