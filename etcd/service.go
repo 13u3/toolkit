@@ -66,7 +66,7 @@ func PrintEtcdKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse)
 }
 
 // 获取指定服务列表
-func (e *EtcdService) GetServiceList(key string) ([]ServiceContent, error) {
+func (e *EtcdService) GetServiceList(key string, status ...string) ([]ServiceContent, error) {
 	if e.Client == nil {
 		return nil, fmt.Errorf("Etcd连接未初始化")
 	}
@@ -88,24 +88,24 @@ func (e *EtcdService) GetServiceList(key string) ([]ServiceContent, error) {
 		serviceList = append(serviceList, serviceContent)
 		//serviceList = append(serviceList, string(kvpair.Value))
 	}
+	if(status != nil){
+	    serviceList = FilterService(serviceList, status[0])
+	}
 	return serviceList, nil
 }
 
-// 获取运行中的服务列表
-func (e *EtcdService) GetRunningServiceList(serviceList []ServiceContent) ([]string) {
-	var services []string
-    if len(serviceList) > 0 {
-        for _, service := range serviceList {
-			/* if service.Status == "Running" {
-				value, ok := service["Address"]
-				if ok {
-					serviceList = append(serviceList, value)
-				}
-			} */
-			fmt.Printf("获取运行中的服务列表::::%+v\n", service)
-		}
-    }
-	return services
+// 筛选服务列表
+func FilterService(serviceList []ServiceContent, serviceStatus string) ([]ServiceContent) {
+	for index, service := range serviceList {
+	    if service.Status != serviceStatus {
+	        RemoveElement(serviceList, index)
+	    }
+	}
+	return serviceList
+}
+// 删除数组指定元素（index: 索引）
+func RemoveElement(s []ServiceContent, index int) []ServiceContent {
+    return append(s[:index], s[index+1:]...)
 }
 
 // 监听指定服务列表
