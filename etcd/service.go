@@ -9,15 +9,17 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
+// 监听回调函数
 type WatchCallback struct{
 	Type string //事件类型 PUT/DELETE
 	Key string //服务key
 	Value string //服务value
 }
 
+// 服务注册的Value值
 type ServiceContent struct {
     Address string `json:"address"`
-	Status string `json:"status"`
+	Status string `json:"status"` // 服务状态： Pendding/Running/Stopped
 }
 
 // 注册服务
