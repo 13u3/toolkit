@@ -82,7 +82,7 @@ func (e *EtcdService) WatchService(callback func(WatchCallback)) error{
     if e.Client == nil {
 		return fmt.Errorf("Etcd连接未初始化")
 	}
-	watchRespCh := e.Client.Watch(context.Background(), servicePrefix + key, clientv3.WithPrefix())
+	watchRespCh := e.Client.Watch(context.Background(), servicePrefix + e.RegContent.Key, clientv3.WithPrefix())
 	go func() {
 		fmt.Println("开始监听"+e.RegContent.Key+"服务......")
 	    for {
