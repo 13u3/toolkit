@@ -2,6 +2,7 @@ package etcd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -12,6 +13,11 @@ type WatchCallback struct{
 	Type string //事件类型 PUT/DELETE
 	Key string //服务key
 	Value string //服务value
+}
+
+type ServiceContent struct {
+    Address string `json:"address"`
+	Status string `json:"status"`
 }
 
 // 注册服务
@@ -58,7 +64,7 @@ func PrintEtcdKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse)
 }
 
 // 获取指定服务列表
-func (e *EtcdService) GetServiceList(key string) ([]string, error) {
+func (e *EtcdService) GetServiceList(key string) ([]ServiceContent, error) {
 	if e.Client == nil {
 		return nil, fmt.Errorf("Etcd连接未初始化")
 	}
@@ -70,9 +76,15 @@ func (e *EtcdService) GetServiceList(key string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var serviceList []string
+	var serviceList []ServiceContent
 	for _, kvpair := range resp.Kvs {
-		serviceList = append(serviceList, string(kvpair.Value))
+		var serviceContent ServiceContent
+		err = json.Unmarshal([]byte(kvpair.Value), &serviceContent)
+		if(err != nil){
+		    break
+		}
+		serviceList = append(serviceList, serviceContent)
+		//serviceList = append(serviceList, string(kvpair.Value))
 	}
 	return serviceList, nil
 }
