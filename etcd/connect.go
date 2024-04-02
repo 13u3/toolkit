@@ -7,14 +7,7 @@ import (
 )
 type EtcdService struct {
 	Client *clientv3.Client
-	RegContent RegContent
 }
-
-type RegContent struct {
-    Key string
-	Value string
-}
-
 
 const(
 	servicePrefix = "/service/"
