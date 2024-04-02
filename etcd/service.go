@@ -91,6 +91,23 @@ func (e *EtcdService) GetServiceList(key string) ([]ServiceContent, error) {
 	return serviceList, nil
 }
 
+// 获取运行中的服务列表
+func (e *EtcdService) GetRunningServiceList(serviceList []ServiceContent) ([]string) {
+	var services []string
+    if len(serviceList) > 0 {
+        for _, service := range serviceList {
+			/* if service.Status == "Running" {
+				value, ok := service["Address"]
+				if ok {
+					serviceList = append(serviceList, value)
+				}
+			} */
+			fmt.Printf("获取运行中的服务列表::::%+v\n", service)
+		}
+    }
+	return services
+}
+
 // 监听指定服务列表
 func (e *EtcdService) WatchService(key string, callback func(WatchCallback)) error{
     if e.Client == nil {
