@@ -15,7 +15,7 @@ type WatchCallback struct{
 }
 
 // 注册服务
-func (e *EtcdService) RegisterService(key, value string) error {
+func (e *EtcdService) RegisterService() error {
 	if e.Client == nil {
 		return fmt.Errorf("连接Etcd未初始化")
 	}
@@ -30,7 +30,7 @@ func (e *EtcdService) RegisterService(key, value string) error {
 		return err
 	}
 	// 注册自己的服务，并绑定租约
-	_, err = kv.Put(ctx, servicePrefix + key, value, clientv3.WithLease(leaseResp.ID))
+	_, err = kv.Put(ctx, servicePrefix + e.RegContent.Key, e.RegContent.Value, clientv3.WithLease(leaseResp.ID))
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func PrintEtcdKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse)
 }
 
 // 获取指定服务列表
-func (e *EtcdService) GetServiceList(key string) ([]string, error) {
+func (e *EtcdService) GetServiceList() ([]string, error) {
 	if e.Client == nil {
 		return nil, fmt.Errorf("Etcd连接未初始化")
 	}
@@ -66,7 +66,7 @@ func (e *EtcdService) GetServiceList(key string) ([]string, error) {
 	//ctx := context.Background()
 	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
 	defer cancel()
-	resp, err := kv.Get(ctx, servicePrefix + key, clientv3.WithPrefix())
+	resp, err := kv.Get(ctx, servicePrefix + e.RegContent.Key, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
@@ -78,13 +78,13 @@ func (e *EtcdService) GetServiceList(key string) ([]string, error) {
 }
 
 // 监听指定服务列表
-func (e *EtcdService) WatchService(key string, callback func(WatchCallback)) error{
+func (e *EtcdService) WatchService(callback func(WatchCallback)) error{
     if e.Client == nil {
 		return fmt.Errorf("Etcd连接未初始化")
 	}
 	watchRespCh := e.Client.Watch(context.Background(), servicePrefix + key, clientv3.WithPrefix())
 	go func() {
-		fmt.Println("开始监听"+key+"服务......")
+		fmt.Println("开始监听"+e.RegContent.Key+"服务......")
 	    for {
 	        select {
 	        case watchResp := <-watchRespCh:
