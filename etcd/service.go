@@ -97,17 +97,19 @@ func (e *EtcdService) GetServiceList(key string, status ...string) ([]ServiceCon
 // 筛选服务列表
 func FilterServiceByStatus(serviceList []ServiceContent, serviceStatus string) ([]ServiceContent) {
 	for index, service := range serviceList {
-	    if service.Status != serviceStatus {
+		fmt.Printf("index: %d, status: %+v\n", index, service)
+	    /* if service.Status != serviceStatus {
 			serviceList = append(serviceList[:index], serviceList[index+1:]...)
+			//return append(serviceList[:index], serviceList[index+1:]...)
 	        //RemoveElement(serviceList, index)
-	    }
+	    } */
 	}
 	return serviceList
 }
 // 删除数组指定元素（index: 索引）
-func RemoveElement(s []ServiceContent, index int) []ServiceContent {
+/* func RemoveElement(s []ServiceContent, index int) []ServiceContent {
     return append(s[:index], s[index+1:]...)
-}
+} */
 
 // 监听指定服务列表
 func (e *EtcdService) WatchService(key string, callback func(WatchCallback)) error{
