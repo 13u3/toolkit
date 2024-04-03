@@ -89,13 +89,13 @@ func (e *EtcdService) GetServiceList(key string, status ...string) ([]ServiceCon
 		//serviceList = append(serviceList, string(kvpair.Value))
 	}
 	if(status != nil && status[0] != ""){
-	    serviceList = FilterServiceByStatus(serviceList, status[0])
+	    serviceList = e.filterServiceByStatus(serviceList, status[0])
 	}
 	return serviceList, nil
 }
 
 // 筛选服务列表
-func FilterServiceByStatus(serviceList []ServiceContent, serviceStatus string) ([]ServiceContent) {
+func (e *EtcdService) filterServiceByStatus(serviceList []ServiceContent, serviceStatus string) ([]ServiceContent) {
 	var respServices []ServiceContent
 	for index, service := range serviceList {
 	    if service.Status == serviceStatus {
