@@ -66,7 +66,7 @@ func PrintEtcdKeepRespChan(keepRespChan <-chan *clientv3.LeaseKeepAliveResponse)
 }
 
 // 获取指定服务列表
-func (e *EtcdService) GetServiceList(key string, status ...string) ([]ServiceContent, error) {
+func (e *EtcdService) GetServiceList(key string, options ...string) ([]ServiceContent, error) {
 	if e.Client == nil {
 		return nil, fmt.Errorf("Etcd连接未初始化")
 	}
@@ -88,8 +88,11 @@ func (e *EtcdService) GetServiceList(key string, status ...string) ([]ServiceCon
 		serviceList = append(serviceList, serviceContent)
 		//serviceList = append(serviceList, string(kvpair.Value))
 	}
-	if(status != nil && status[0] != ""){
-	    serviceList = e.filterServiceByStatus(serviceList, status[0])
+	if(options != nil){
+		switch {
+			case options[0] != "":
+				serviceList = e.filterServiceByStatus(serviceList, options[0])
+		}
 	}
 	return serviceList, nil
 }
