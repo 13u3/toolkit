@@ -88,7 +88,7 @@ func (e *EtcdService) GetServiceList(key string, status ...string) ([]ServiceCon
 		serviceList = append(serviceList, serviceContent)
 		//serviceList = append(serviceList, string(kvpair.Value))
 	}
-	if(status != nil){
+	if(status != nil && status[0] != ""){
 	    serviceList = FilterServiceByStatus(serviceList, status[0])
 	}
 	return serviceList, nil
@@ -96,20 +96,14 @@ func (e *EtcdService) GetServiceList(key string, status ...string) ([]ServiceCon
 
 // 筛选服务列表
 func FilterServiceByStatus(serviceList []ServiceContent, serviceStatus string) ([]ServiceContent) {
+	var respServices []ServiceContent
 	for index, service := range serviceList {
-		fmt.Printf("index: %d, status: %+v\n", index, service)
 	    if service.Status == serviceStatus {
-			serviceList = append(serviceList[:index], serviceList[index+1:]...)
-			//return append(serviceList[:index], serviceList[index+1:]...)
-	        //RemoveElement(serviceList, index)
+			respServices = append(respServices, serviceList[index])
 	    }
 	}
-	return serviceList
+	return respServices
 }
-// 删除数组指定元素（index: 索引）
-/* func RemoveElement(s []ServiceContent, index int) []ServiceContent {
-    return append(s[:index], s[index+1:]...)
-} */
 
 // 监听指定服务列表
 func (e *EtcdService) WatchService(key string, callback func(WatchCallback)) error{
