@@ -98,11 +98,11 @@ func (e *EtcdService) GetServiceList(key string, status ...string) ([]ServiceCon
 func FilterServiceByStatus(serviceList []ServiceContent, serviceStatus string) ([]ServiceContent) {
 	for index, service := range serviceList {
 		fmt.Printf("index: %d, status: %+v\n", index, service)
-	    /* if service.Status != serviceStatus {
+	    if service.Status == serviceStatus {
 			serviceList = append(serviceList[:index], serviceList[index+1:]...)
 			//return append(serviceList[:index], serviceList[index+1:]...)
 	        //RemoveElement(serviceList, index)
-	    } */
+	    }
 	}
 	return serviceList
 }
